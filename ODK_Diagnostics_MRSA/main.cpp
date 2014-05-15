@@ -87,7 +87,51 @@ int main(int argc, char** argv)
 	element = getStructuringElement(MORPH_CROSS, Size(2 * erosion_size + 1, 2 * erosion_size + 1), Point(erosion_size, erosion_size));
 	erode(croppedBlurred, croppedBlurred, element);
 	dilate(croppedBlurred, croppedBlurred, element);
-	  
+	
+	
+	// Finding countours
+	// Thresholds
+	int thresh = 100;
+	int max_thresh = 255;
+	RNG rng(12345);
+	double area;
+
+	Mat canny_output;
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+	vector<Point> approx;
+
+	// Detect edges using canny
+	Canny(croppedBlurred, canny_output, thresh, thresh * 2, 3);
+	
+	// Find contours
+	findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+	 
+	// Draw contours
+	Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
+	for (int i = 0; i< contours.size(); i++)
+	{
+		area = contourArea(contours[i]); 
+		approxPolyDP(contours[i], approx, 5, true);
+
+		if (area > 300) {
+			std::cout << area;
+			std::cout << "\n";
+
+			Scalar color = Scalar(255, 255, 255); 
+
+			drawContours(drawing, contours, i, Scalar(0, 255, 255), CV_FILLED); 
+			vector<Point>::iterator vertex;
+			
+			for (vertex = approx.begin(); vertex != approx.end(); ++vertex)
+			{
+				circle(croppedBlurred, *vertex, 3, Scalar(0, 0, 255), 1);
+			}
+		} 
+	}
+
+	
+	/*
 	vector<Vec3f> circles;
 	// Apply the Hough Transform to find the circles
 	HoughCircles(croppedBlurred, circles, CV_HOUGH_GRADIENT,
@@ -102,7 +146,7 @@ int main(int argc, char** argv)
 
 	int rowsCropped = original_cropped.rows;
 	int colsCropped = original_cropped.cols;
-
+	
 	// Draw the circles detected
 	for (size_t i = 0; i < circles.size(); i++)
 	{
@@ -125,7 +169,7 @@ int main(int argc, char** argv)
 		}
 	}
 	std::cout << "\n";
-	 
+	 */
 
 
 	//	namedWindow("Original", CV_WINDOW_FREERATIO);
@@ -136,7 +180,7 @@ int main(int argc, char** argv)
 	//	imshow("Original", src);
 	//	imshow("Blue Channel", blue_channel);
 		imshow("Blue Channel + Cropped", croppedBlurred);
-		imshow("Original Photo - With Fiducials", original_cropped);
+		imshow("Original Photo - With Fiducials", drawing);
 
 	waitKey(0);
 
