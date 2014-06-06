@@ -12,8 +12,9 @@ using namespace std;
  
 int main(int argc, char** argv) 
 { 
+
 	// Check for correct number of inputs
-	if (argc != 2)
+	if (argc != 2)	
 	{			
 		cout << " Usage: OpenCVTestCode ImageToLoadAndDisplay.jpg" << endl;
 		return -1;
@@ -27,8 +28,8 @@ int main(int argc, char** argv)
 	{									
 		cout << "Could not open or find the image" << std::endl;
 		return -1;
-	}
- 
+	} 
+
 	// Given image
 	Mat src = image;
 	Mat channel[3];
@@ -75,8 +76,7 @@ int main(int argc, char** argv)
 	// Apply the erosion operation
 	erode(croppedBlurred, croppedBlurred, element);
 	dilate(croppedBlurred, croppedBlurred, element);
-	 
-	
+ 
 	// Finding contours
 	// Thresholds
 	int thresh = 50;
@@ -97,19 +97,19 @@ int main(int argc, char** argv)
 	 
 	// Draw contours
 	Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
-	for (int i = 0; i< contours.size(); i++)
-	{
-		area = contourArea(contours[i]); 
-		approxPolyDP(contours[i], approx, 5, true);
+
+	for (int j = 0; j < contours.size(); j++) {
+		area = contourArea(contours[j]);
+		approxPolyDP(contours[j], approx, 5, true);
 
 		if (area > 300) { 
-			std::cout << "Area of circle: ";
-			std::cout << area;
-			std::cout << "\n";
+			cout << "Area of circle: ";
+			cout << area;
+			cout << "\n";
 
 			Scalar color = Scalar(255, 255, 255); 
 
-			drawContours(drawing, contours, i, Scalar(0, 255, 255), CV_FILLED); 
+			drawContours(drawing, contours, j, Scalar(0, 255, 255), CV_FILLED);
 			vector<Point>::iterator vertex;
 			
 			for (vertex = approx.begin(); vertex != approx.end(); ++vertex)
@@ -117,22 +117,22 @@ int main(int argc, char** argv)
 				circle(croppedBlurred, *vertex, 3, Scalar(0, 0, 255), 1);
 			}
 		} 
+ 
 	}
-	std::cout << "\n";
+	cout << "\n";
 	 
 
-
-	
+	 
 	namedWindow("Blue Channel", CV_WINDOW_FREERATIO);
 	namedWindow("Canny Output", CV_WINDOW_FREERATIO);
 	namedWindow("Blue Channel + Cropped", CV_WINDOW_FREERATIO); 
 	namedWindow("Original Photo - With Fiducials", CV_WINDOW_FREERATIO);
-
+	 
 	imshow("Blue Channel", blue_channel);
 	imshow("Canny Output", canny_output);
 	imshow("Blue Channel + Cropped", croppedBlurred);
 	imshow("Original Photo - With Fiducials", drawing);
-
+ 
 	waitKey(0);
 
 	return 0;
